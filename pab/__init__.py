@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-from pab import PyAndroidBuild
 import nicecopy
 import os
+import types
 from misc import pjoin
+from vendor import vendor_xxx
+from pab import PyAndroidBuild
 
 
 def backup_to_metadata(pab):
@@ -45,6 +47,7 @@ def main():
         pab.pab_geno()
         pab.print_success('Build OTA done.')
     elif pab.build_vendor:
+        pab.pack_vendor = types.MethodType(vendor_xxx, pab)
         pab.pack_vendor()
     elif pab.diff_ota:
         if pab.source_package and pab.target_package:

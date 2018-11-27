@@ -11,6 +11,7 @@ from build_argument import BuildArgument
 from color_print import ColorPrint
 from misc import pjoin
 from build_env import BuildEnv
+from vendor import get_vendor_xxx_info
 
 
 class PyAndroidBuild():
@@ -51,7 +52,7 @@ class PyAndroidBuild():
         self.res_out_logo = "resource_logo.img"
         self.res_out_fdt = "resource_dtb.img"
         self.misc_img = pjoin(self.android_top, "rkst/Image")
-        self.vendor_package_tag = "Vendor_Package"
+        self.vendor_package_tag = get_vendor_xxx_info()[2]
 
     def goto_exit(self, die_message=None):
         if die_message:
@@ -167,32 +168,6 @@ class PyAndroidBuild():
         # copy userdata
         nicecopy.ncopy(pjoin(self.android_out,
                              "userdata.img"), pjoin(self.android_top, "metadata"))
-
-    def pack_vendor(self):
-        package_suffix = ".vendor"
-        pab_package_prefix = self.product_device[7:] + self.vendor_package_tag
-        vendor_name = pab_package_prefix + self.time_stamp + package_suffix
-
-        # pack file list below under metadata
-        vendor_content_filename = "pabuild/vendor.txt"
-        pack_list = []
-        with open(vendor_content_filename) as f:
-            pack_list = f.read().splitlines()
-
-        # Found no file to pack? exit
-        if pack_list == []:
-            self.goto_exit("check your pabuild/vendor.txt")
-
-        # tarball file with password 123456
-        # rar a -ep -hp123456 package.vendor file
-        # exclude path from name
-        pack_cmd = "/usr/bin/rar a -ep -hp123456"
-        pack_cmd += " metadata/%s" % vendor_name
-        for pimages in pack_list:
-            pack_cmd += " metadata/%s" % pimages
-
-        self.run_command(pack_cmd)
-        self.print_success("===> metadata/" + vendor_name)
 
     def pab_genu(self):
         """ build uboot """
