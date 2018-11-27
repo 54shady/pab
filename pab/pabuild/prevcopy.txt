@@ -1,0 +1,10 @@
+drivers/gpu/arm/mali400/ump/arch-pb-virtex5/config.h
+drivers/gpu/arm/mali400/ump/arch-pb-virtex5-m400-4/config.h
+drivers/gpu/arm/mali400/ump/arch-default/config.h
+drivers/gpu/arm/mali400/ump/arch/config.h
+scripts/bmptologo
+drivers/gpu/arm/mali400/ump/linux/license
+drivers/gpu/arm/mali400/mali/linux/license
+drivers/net/wireless/rockchip_wlan/wifi_sys
+logo_kernel.bmp
+logo.bmp

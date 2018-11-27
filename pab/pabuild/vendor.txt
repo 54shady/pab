@@ -1,0 +1,7 @@
+boot.img
+system.img
+misc.img
+recovery.img
+RK3288UbootLoader_V2.30.10.bin
+userdata.img
+parameter
