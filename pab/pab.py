@@ -243,8 +243,7 @@ class PyAndroidBuild():
                     --ramdisk %s/ramdisk-recovery.img --second %s/resource.img --output %s/recovery.img" % (
                 self.host_bin, self.kernel_out, self.android_out, self.kernel_out, self.android_out)
             cmds.append(cmd)
-            for cmd in cmds:
-                self.run_command(cmd)
+            self.run_cmdlist(cmds)
 
             nicecopy.ncopy(pjoin(self.android_out,
                                  'recovery.img'), self.final_images)
@@ -266,8 +265,7 @@ class PyAndroidBuild():
                                self.android_out, self.kernel_out, self.android_out)
 
             cmds.append(cmd)
-            for cmd in cmds:
-                self.run_command(cmd)
+            self.run_cmdlist(cmds)
 
             nicecopy.ncopy(pjoin(self.android_out,
                                  'boot.img'), self.final_images)
