@@ -18,34 +18,28 @@ class BuildArgument():
                      --------------------------------------------------
                      '''))
 
-        # bool
+        parser.add_argument(
+            "-j", "--jobs", help="running jobs", type=int)
         parser.add_argument(
             "-a", "--droid", help="build android", action="store_true")
-        parser.add_argument(
-            "--diffota", help="build android diff OTA package", action="store_true")
         parser.add_argument(
             "-p", "--package", help="build vendor package", action="store_true")
         parser.add_argument(
             "-k", "--kernel", help="build kernel", action="store_true")
         parser.add_argument(
-            "-u", "--uboot", help="build uboot", action="store_true")
+            "--kmodule", help="build kernel modules only", action="store_true")
         parser.add_argument(
             "-c", "--menuconfig", help="kernel config", action="store_true")
+        parser.add_argument(
+            "-u", "--uboot", help="build uboot", action="store_true")
         parser.add_argument(
             "-s", "--system", help="pack system image", action="store_true")
         parser.add_argument(
             "-O", "--buildota", help="build Android OTA package", action="store_true")
-
-        # int
-        parser.add_argument(
-            "-j", "--jobs", help="running jobs", type=int)
-
-        # string
         parser.add_argument(
             "-t", "--target_product", help="target_product for android", type=str)
         parser.add_argument(
-            "-v", "--build_varient", help="userdebug or user", type=str,
-            choices=["userdebug", "user"])
+            "--diffota", help="build android diff OTA package", action="store_true")
         parser.add_argument(
             "--source", help="OTA source package", type=str)
         parser.add_argument(
@@ -53,11 +47,14 @@ class BuildArgument():
         parser.add_argument(
             "-C", "--clean", help="Clean build images", type=str,
             choices=["android", "kernel"])
+        parser.add_argument(
+            "-v", "--build_varient", help="userdebug or user", type=str,
+            choices=["userdebug", "user"])
 
         # auto complete the argument with TAB
         argcomplete.autocomplete(parser)
         # 1. put the line below in ~/.bashrc
-        #   eval "$(register-python-argcomplete pad)"
+        #   eval "$(register-python-argcomplete pab)"
         # 2. install the complete function
         # activate-global-python-argcomplete [--user]
 
@@ -77,6 +74,7 @@ class BuildArgument():
         self.__build_droid = True if args.droid else False
         self.__build_vendor_package = True if args.package else False
         self.__build_kernel = True if args.kernel else False
+        self.__build_kmodule_only = True if args.kmodule else False
         self.__build_uboot = True if args.uboot else False
         self.__diff_ota = True if args.diffota else False
 
@@ -104,6 +102,7 @@ class BuildArgument():
             "TARGET_BUILD_VARIANT"]
         self.argsd = {
             "build_kernel": self.__build_kernel,
+            "build_kmodule": self.__build_kmodule_only,
             "build_uboot": self.__build_uboot,
             "build_droid": self.__build_droid,
             "build_vendor": self.__build_vendor_package,

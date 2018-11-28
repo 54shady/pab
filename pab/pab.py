@@ -311,6 +311,19 @@ class PyAndroidBuild():
         make_menuconfig = self.kernel_make_target("menuconfig")
         self.run_command(make_menuconfig)
 
+    def run_cmdlist(self, cmd_list):
+        for cmd in cmd_list:
+            self.run_command(cmd)
+
+    def append_modules_target(self, cmd_list):
+        make_module = self.kernel_make_target("modules")
+        cmd_list.append(make_module)
+
+    def make_kernel_modules_only(self):
+        l = []
+        self.append_modules_target(l)
+        self.run_cmdlist(l)
+
     def pab_genk(self):
         """ build kernel """
         # copy necessary file or dir
@@ -350,12 +363,10 @@ class PyAndroidBuild():
         dtbs_d = dict(zip(k, v))
 
         # modules cmd
-        make_module = self.kernel_make_target("modules")
-        make_cmds.append(make_module)
+        self.append_modules_target(make_cmds)
 
         # start make things we need
-        for cmd in make_cmds:
-            self.run_command(cmd)
+        self.run_cmdlist(make_cmds)
 
         # pack resource image
         # multi dtb supported

@@ -43,6 +43,8 @@ def main():
         backup_to_metadata(pab)
     elif pab.pack_system:
         pab.pab_gens()
+    elif pab.build_kmodule:
+        pab.make_kernel_modules_only()
     elif pab.build_ota:
         pab.pab_geno()
         pab.print_success('Build OTA done.')
