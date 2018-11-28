@@ -2,11 +2,12 @@
 # coding=utf-8
 
 from misc import parse_kv_file
+from config_file import get_config_file
 
 
 def get_vendor_xxx_info():
-    buildrc = "pabuild/pabrc"
-    brc = parse_kv_file(buildrc)
+    pabrc = get_config_file("pabrc")
+    brc = parse_kv_file(pabrc)
     version_nb = brc.get('VERSION_NUMBER')
     android_version = brc.get('VENDOR_ANDROID_VERSION')
     platform_name = brc.get('VENDOR_PLATFORM_NAME')
@@ -25,10 +26,11 @@ def vendor_xxx(pabObj):
     """
     vendor_suffix, passwd, vendor_tag = get_vendor_xxx_info()
     pab_package_prefix = pabObj.product_device[7:] + vendor_tag
-    vendor_package_name = pab_package_prefix + pabObj.time_stamp + "." + vendor_suffix
+    vendor_package_name = pab_package_prefix + \
+        pabObj.time_stamp + "." + vendor_suffix
 
     # pack file list below under metadata
-    vendor_file = "pabuild/vendor.txt"
+    vendor_file = get_config_file("vendor")
     pack_list = []
     with open(vendor_file) as f:
         pack_list = f.read().splitlines()

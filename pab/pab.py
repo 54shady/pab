@@ -12,6 +12,7 @@ from color_print import ColorPrint
 from misc import pjoin
 from build_env import BuildEnv
 from vendor import get_vendor_xxx_info
+from config_file import get_config_file
 
 
 class PyAndroidBuild():
@@ -327,7 +328,7 @@ class PyAndroidBuild():
     def pab_genk(self):
         """ build kernel """
         # copy necessary file or dir
-        prev_copy_filename = "pabuild/prevcopy.txt"
+        prev_copy_filename = get_config_file("prevcp")
         with open(prev_copy_filename) as f:
             cp_list = f.read().splitlines()
         nicecopy.copy_stuffs(self.kernel_src, self.kernel_out, cp_list)
@@ -347,7 +348,7 @@ class PyAndroidBuild():
         make_cmds.append(make_kernel)
 
         # dtb cmd
-        dtb_file = "pabuild/dtbs"
+        dtb_file = get_config_file("dtbs")
         k = []
         v = []
         with open(dtb_file) as f:
@@ -388,7 +389,7 @@ class PyAndroidBuild():
         shutil.rmtree(fdt_res_dir)
 
         # Misc stuff
-        post_copy_filename = "pabuild/postcopy.txt"
+        post_copy_filename = get_config_file("postcp")
         with open(post_copy_filename) as f:
             misc_stuff = f.read().splitlines()
         nicecopy.copy_stuffs(self.kernel_out, self.kernel_src, misc_stuff)

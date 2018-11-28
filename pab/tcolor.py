@@ -4,8 +4,10 @@
 # a little bit like enum in C language
 BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
 
+
 def fg_red():
     return pick_color(fg=RED)
+
 
 def pick_color(fg=None, bg=None, bright=False, bold=False, dim=False, reset=False):
     # manually derived from http://en.wikipedia.org/wiki/ANSI_escape_code#Codes

@@ -6,6 +6,7 @@ import textwrap
 import os
 import argcomplete
 from misc import parse_kv_file
+from config_file import get_config_file
 
 
 class BuildArgument():
@@ -62,7 +63,7 @@ class BuildArgument():
         args = parser.parse_args()
 
         # run this tool on android top dir
-        self.__buildconfig = "pabuild/pabrc"
+        self.__buildconfig = get_config_file("pabrc")
         try:
             assert os.path.exists(self.__buildconfig)
         except AssertionError:

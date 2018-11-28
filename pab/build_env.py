@@ -4,6 +4,7 @@
 import os
 from misc import pjoin
 from misc import parse_kv_file
+from config_file import get_config_file
 
 
 class BuildEnv():
@@ -16,7 +17,7 @@ class BuildEnv():
         self.__cross_compile = pjoin(self.__android_top, self.__armgcc)
         self.__host_bin = "out/host/linux-x86/bin"
         self.__host_utils_dir = pjoin(self.__android_top, self.__host_bin)
-        self.__build_target = "pabuild/build_target"
+        self.__build_target = get_config_file("bt")
         build_target = parse_kv_file(self.__build_target)
         self.envd = {
             "android_top": self.__android_top,
