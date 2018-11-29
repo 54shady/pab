@@ -351,40 +351,45 @@ class PyAndroidBuild():
         v = []
         with open(dtb_file) as f:
             dtb_list = f.read().splitlines()
-        for dtb in dtb_list:
-            k.append(dtb)
-            v.append(dtb[len('rk3288-'):-len('.dtb')].swapcase() + '.dtb')
-            make_dtb = self.kernel_make_target(dtb)
-            make_cmds.append(make_dtb)
 
-        # map dtb to alias name
-        # dtbs_d = {'rk3288-aaa.dtb' : AAA.dtb}
-        dtbs_d = dict(zip(k, v))
+        # dtb file not empty
+        if not dtb_list == []:
+            for dtb in dtb_list:
+                k.append(dtb)
+                v.append(dtb[len('rk3288-'):-len('.dtb')].swapcase() + '.dtb')
+                make_dtb = self.kernel_make_target(dtb)
+                make_cmds.append(make_dtb)
 
-        # modules cmd
-        self.append_modules_target(make_cmds)
+            # map dtb to alias name
+            # dtbs_d = {'rk3288-aaa.dtb' : AAA.dtb}
+            dtbs_d = dict(zip(k, v))
+
+            # modules cmd
+            self.append_modules_target(make_cmds)
 
         # start make things we need
         self.run_cmdlist(make_cmds)
 
-        # pack resource image
-        # multi dtb supported
-        fdt_res_dir = pjoin(self.android_top, "fdt_res")
-        if not os.path.exists(fdt_res_dir):
-            os.mkdir(fdt_res_dir)
+        # dtb file not empty
+        if not dtb_list == []:
+            # pack resource image
+            # multi dtb supported
+            fdt_res_dir = pjoin(self.android_top, "fdt_res")
+            if not os.path.exists(fdt_res_dir):
+                os.mkdir(fdt_res_dir)
 
-        # copy dtbs to fdt_res_dir
-        dtbs_dir = pjoin(self.kernel_out, "arch/arm/boot/dts/")
+            # copy dtbs to fdt_res_dir
+            dtbs_dir = pjoin(self.kernel_out, "arch/arm/boot/dts/")
 
-        for i in range(len(dtb_list)):
-            nicecopy.ncopy(dtbs_dir + dtb_list[i], fdt_res_dir,
-                           dtbs_d[dtb_list[i]])
+            for i in range(len(dtb_list)):
+                nicecopy.ncopy(dtbs_dir + dtb_list[i], fdt_res_dir,
+                               dtbs_d[dtb_list[i]])
 
-        fdt_res = pjoin(self.android_top, "fdt_res")
-        res_in = pjoin(self.kernel_out, "resource.img")
-        res_out = pjoin(fdt_res, "resource_fdt.img")
-        self.pab_packres(fdt_res, res_in, res_out)
-        shutil.rmtree(fdt_res_dir)
+            fdt_res = pjoin(self.android_top, "fdt_res")
+            res_in = pjoin(self.kernel_out, "resource.img")
+            res_out = pjoin(fdt_res, "resource_fdt.img")
+            self.pab_packres(fdt_res, res_in, res_out)
+            shutil.rmtree(fdt_res_dir)
 
         # Misc stuff
         post_copy_filename = get_config_file("postcp")
