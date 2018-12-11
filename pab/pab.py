@@ -177,18 +177,16 @@ class PyAndroidBuild():
             shutil.rmtree(self.uboot_out)
 
         # make uboot config
-        make_uboot_config = "make -C %s ARCH=arm CROSS_COMPILE=%s O=%s %s" \
-            % (self.uboot_src, self.cross_compile, self.uboot_out,
-               self.uboot_config)
+        make_uboot_config = self.pab_make_target(self.uboot_src, self.uboot_out,
+                                                 self.uboot_config)
 
         if not os.path.exists(pjoin(self.uboot_out, ".config")):
             self.run_command(make_uboot_config)
 
         nicecopy.ncopy(self.rktools, self.uboot_out)
 
-        # make uboot
-        make_uboot = "make -C %s ARCH=arm CROSS_COMPILE=%s O=%s -j%d" \
-            % (self.uboot_src, self.cross_compile, self.uboot_out, self.jobs_nr)
+        # make uboot, which just make without named target
+        make_uboot = self.pab_make_target(self.uboot_src, self.uboot_out, "")
         self.run_command(make_uboot)
 
         nicecopy.ncopy(self.loader, self.final_images)
@@ -293,21 +291,23 @@ class PyAndroidBuild():
         if os.path.exists(self.kernel_out):
             shutil.rmtree(self.kernel_out)
 
-    def kernel_make_target(self, target):
-        """ wraper for kernel make """
+    def pab_make_target(self, src, out, target):
+        """ wraper for make x """
         make_target = "make -C %s ARCH=arm CROSS_COMPILE=%s O=%s %s -j%d" \
-            % (self.kernel_src, self.cross_compile,
-               self.kernel_out, target, self.jobs_nr)
+            % (src, self.cross_compile,
+               out, target, self.jobs_nr)
         return make_target
 
     def pab_kconfig(self):
         # no config file, generate it first
-        make_config = self.kernel_make_target(self.kernel_config_file)
+        make_config = self.pab_make_target(
+            self.kernel_src, self.kernel_out, self.kernel_config_file)
         if not os.path.exists(pjoin(self.kernel_out, ".config")):
             self.run_command(make_config)
 
         # make menuconfig
-        make_menuconfig = self.kernel_make_target("menuconfig")
+        make_menuconfig = self.pab_make_target(
+            self.kernel_src, self.kernel_out, "menuconfig")
         self.run_command(make_menuconfig)
 
     def run_cmdlist(self, cmd_list):
@@ -315,7 +315,8 @@ class PyAndroidBuild():
             self.run_command(cmd)
 
     def append_modules_target(self, cmd_list):
-        make_module = self.kernel_make_target("modules")
+        make_module = self.pab_make_target(
+            self.kernel_src, self.kernel_out, "modules")
         cmd_list.append(make_module)
 
     def make_kernel_modules_only(self):
@@ -335,14 +336,16 @@ class PyAndroidBuild():
         make_cmds = []
 
         # config cmd
-        make_config = self.kernel_make_target(self.kernel_config_file)
+        make_config = self.pab_make_target(
+            self.kernel_src, self.kernel_out, self.kernel_config_file)
 
         # not config file? make one
         if not os.path.exists(pjoin(self.kernel_out, ".config")):
             make_cmds.append(make_config)
 
         # kernel cmd
-        make_kernel = self.kernel_make_target(self.kernel_target_image)
+        make_kernel = self.pab_make_target(
+            self.kernel_src, self.kernel_out, self.kernel_target_image)
         make_cmds.append(make_kernel)
 
         # dtb cmd
@@ -357,15 +360,16 @@ class PyAndroidBuild():
             for dtb in dtb_list:
                 k.append(dtb)
                 v.append(dtb[len('rk3288-'):-len('.dtb')].swapcase() + '.dtb')
-                make_dtb = self.kernel_make_target(dtb)
+                make_dtb = self.pab_make_target(self.kernel_src,
+                                                self.kernel_out, dtb)
                 make_cmds.append(make_dtb)
 
             # map dtb to alias name
             # dtbs_d = {'rk3288-aaa.dtb' : AAA.dtb}
             dtbs_d = dict(zip(k, v))
 
-            # modules cmd
-            self.append_modules_target(make_cmds)
+        # modules cmd
+        self.append_modules_target(make_cmds)
 
         # start make things we need
         self.run_cmdlist(make_cmds)
