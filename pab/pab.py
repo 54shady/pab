@@ -286,10 +286,19 @@ class PyAndroidBuild():
         self.print_success("===> " + self.final_images_r +
                            "/pcba_whole_misc.img")
 
+    def pab_uclean(self):
+        target_res_tool = pjoin(self.android_out, "resource_tool")
+        if os.path.exists(target_res_tool):
+            shutil.rmtree(target_res_tool)
+        if os.path.exists(self.uboot_out):
+            shutil.rmtree(self.uboot_out)
+        self.print_success("Uboot clean done.")
+
     def pab_kclean(self):
         # clean all
         if os.path.exists(self.kernel_out):
             shutil.rmtree(self.kernel_out)
+        self.print_success("Kernel clean done.")
 
     def pab_make_target(self, src, out, target):
         """ wraper for make x """
@@ -350,23 +359,15 @@ class PyAndroidBuild():
 
         # dtb cmd
         dtb_file = get_config_file("dtbs")
-        k = []
-        v = []
         with open(dtb_file) as f:
             dtb_list = f.read().splitlines()
 
         # dtb file not empty
         if not dtb_list == []:
             for dtb in dtb_list:
-                k.append(dtb)
-                v.append(dtb[len('rk3288-'):-len('.dtb')].swapcase() + '.dtb')
                 make_dtb = self.pab_make_target(self.kernel_src,
                                                 self.kernel_out, dtb)
                 make_cmds.append(make_dtb)
-
-            # map dtb to alias name
-            # dtbs_d = {'rk3288-aaa.dtb' : AAA.dtb}
-            dtbs_d = dict(zip(k, v))
 
         # modules cmd
         self.append_modules_target(make_cmds)
@@ -386,8 +387,7 @@ class PyAndroidBuild():
             dtbs_dir = pjoin(self.kernel_out, "arch/arm/boot/dts/")
 
             for i in range(len(dtb_list)):
-                nicecopy.ncopy(dtbs_dir + dtb_list[i], fdt_res_dir,
-                               dtbs_d[dtb_list[i]])
+                nicecopy.ncopy(dtbs_dir + dtb_list[i], fdt_res_dir)
 
             fdt_res = pjoin(self.android_top, "fdt_res")
             res_in = pjoin(self.kernel_out, "resource.img")

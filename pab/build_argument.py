@@ -47,7 +47,7 @@ class BuildArgument():
             "--target", help="OTA target package", type=str)
         parser.add_argument(
             "-C", "--clean", help="Clean build images", type=str,
-            choices=["android", "kernel"])
+            choices=["android", "kernel", "uboot"])
         parser.add_argument(
             "-v", "--build_varient", help="userdebug or user", type=str,
             choices=["userdebug", "user"])
@@ -85,6 +85,7 @@ class BuildArgument():
         # clean what build?
         self.__clean_kernel = True if args.clean == "kernel" else False
         self.__clean_android = True if args.clean == "android" else False
+        self.__clean_uboot = True if args.clean == "uboot" else False
 
         self.__kernel_config = True if args.menuconfig else False
         self.__pack_system = True if args.system else False
@@ -109,6 +110,7 @@ class BuildArgument():
             "build_vendor": self.__build_vendor_package,
             "clean_kernel": self.__clean_kernel,
             "clean_android": self.__clean_android,
+            "clean_uboot": self.__clean_uboot,
             "kernel_config": self.__kernel_config,
             "pack_system": self.__pack_system,
             "build_ota": self.__build_ota,
