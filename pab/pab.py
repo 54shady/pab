@@ -253,7 +253,8 @@ class PyAndroidBuild():
         if os.path.exists(self.android_out + '/root'):
             cmds = []
             cmd = "%s/mkbootfs %s/root | %s/minigzip > %s/ramdisk.img" % \
-                (self.host_bin, self.android_out, self.host_bin, self.host_bin)
+                (self.host_bin, self.android_out, self.host_bin,
+                 self.android_out)
             cmds.append(cmd)
             cmd = "/usr/bin/truncate -s %%4 %s/ramdisk.img" % self.android_out
             cmds.append(cmd)
