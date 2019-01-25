@@ -227,6 +227,14 @@ class PyAndroidBuild():
         else:
             self.goto_exit("No system dir exist.")
 
+    def pab_genrecovery(self):
+        """ make recovery image """
+        cmd = "%s %s %s %d recoveryimage" % (self.gendroid,
+                                             self.env_setup,
+                                             self.lunchcombo,
+                                             self.jobs_nr)
+        self.run_command(cmd)
+
     def pab_genr(self):
         """ build recovery image """
         if os.path.exists(self.android_out + '/recovery/root'):

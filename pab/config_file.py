@@ -7,12 +7,17 @@ def get_config_file(filename):
     conf_dir = "pabuild/"
 
     # alias name
-    k = ["pabrc", "bt", "dtbs", "prevcp", "postcp", "vendor"]
+    k = ["pabrc", "bt",
+            "dtbs", "prevcp",
+            "postcp", "vendor",
+            "gendroid", "pcbacp"
+            ]
 
     # real file name
     f_list = ["pabrc", "build_target",
               "dtbs", "prevcopy.txt",
-              "postcopy.txt", "vendor.txt"
+              "postcopy.txt", "vendor.txt",
+              "gendroid.sh", "pcbacp.sh"
               ]
 
     v = []

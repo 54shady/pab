@@ -5,13 +5,13 @@ import sys
 
 
 class SingleListNode():
-    def __init__(self, data, action=None):
-        self.data = data
+    def __init__(self, onoff, action=None):
+        self.onoff = onoff
         self.next = None
         self.build_action = action
 
     def __str__(self):
-        return self.data
+        return self.onoff
 
 
 class SingleList():
@@ -24,14 +24,14 @@ class SingleList():
     def list_len(self):
         return self.len
 
-    def insert_node_front(self, data, action):
-        node = SingleListNode(data, action)
+    def insert_node_front(self, onoff, action):
+        node = SingleListNode(onoff, action)
         node.next = self.head
         self.head = node
         self.len += 1
 
-    def append_node_rear(self, data, action):
-        node = SingleListNode(data, action)
+    def append_node_rear(self, onoff, action):
+        node = SingleListNode(onoff, action)
         # insert first node
         if not self.head:
             self.head = node
@@ -61,10 +61,10 @@ class SingleList():
         return None
 
     def print_data(self, node):
-        print node.data,
+        print node.onoff,
 
     def run_action(self, node):
-        if node.data:
+        if node.onoff:
             self.default_actionall += 1
             node.build_action()
 

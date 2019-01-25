@@ -32,7 +32,7 @@ class BuildEnv():
             "uboot_src": pjoin(self.__android_top, "u-boot"),
             "kernel_src": pjoin(self.__android_top, "kernel"),
             "env_setup": pjoin(self.__android_top, "build/envsetup.sh"),
-            "gendroid": pjoin(self.__android_top, "gendroid.sh"),
+            "gendroid": get_config_file("gendroid"),
             "kernel_config_file": build_target.get("KERNEL_CONFIG_FILE"),
             "kernel_target_image": build_target.get("KERNEL_TARGET_IMAGE"),
             "uboot_config": build_target.get("UBOOT_CONFIG_FILE"),
