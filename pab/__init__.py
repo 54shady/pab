@@ -75,6 +75,13 @@ def main():
             print diffota_usage
     args_action.append_node_rear(pab.diff_ota, build_otadiff)
 
+    # pack images(append in order)
+    args_action.append_node_rear(pab.pack_boot, pab.pab_genb)
+
+    # for submodule
+    args_action.append_node_rear(pab.submodule,
+                             pab.pab_droid_make_target)
+
     # try argument action first
     args_action.do_command()
 

@@ -46,11 +46,16 @@ class BuildArgument():
         parser.add_argument(
             "--target", help="OTA target package", type=str)
         parser.add_argument(
+            "--module", help="Alternative for make submodule", type=str)
+        parser.add_argument(
             "-C", "--clean", help="Clean build images", type=str,
             choices=["android", "kernel", "uboot"])
         parser.add_argument(
             "-v", "--build_varient", help="userdebug or user", type=str,
             choices=["userdebug", "user"])
+        parser.add_argument(
+            "--pack", help="pack images", type=str,
+            choices=["boot"])
 
         # auto complete the argument with TAB
         argcomplete.autocomplete(parser)
@@ -82,10 +87,15 @@ class BuildArgument():
         self.__source = args.source if args.source else False
         self.__target = args.target if args.target else False
 
+        # for submodule
+        self.__module = args.module if args.module else False
+
         # clean what build?
         self.__clean_kernel = True if args.clean == "kernel" else False
         self.__clean_android = True if args.clean == "android" else False
         self.__clean_uboot = True if args.clean == "uboot" else False
+        # pack x images
+        self.__pack_boot = True if args.pack == "boot" else False
 
         self.__kernel_config = True if args.menuconfig else False
         self.__pack_system = True if args.system else False
@@ -111,12 +121,14 @@ class BuildArgument():
             "clean_kernel": self.__clean_kernel,
             "clean_android": self.__clean_android,
             "clean_uboot": self.__clean_uboot,
+            "pack_boot": self.__pack_boot,
             "kernel_config": self.__kernel_config,
             "pack_system": self.__pack_system,
             "build_ota": self.__build_ota,
             "diff_ota": self.__diff_ota,
             "source_package": self.__source,
             "target_package": self.__target,
+            "submodule": self.__module,
             "target_product": self.__target_product,  # PRODUCT_NAME
             "product_device": self.__product_device,  # PRODUCT_DEVICE
             "build_varient": self.__build_varient,

@@ -227,16 +227,21 @@ class PyAndroidBuild():
         else:
             self.goto_exit("No system dir exist.")
 
-    def pab_genrecovery(self):
-        """ make recovery image """
-        cmd = "%s %s %s %d recoveryimage" % (self.gendroid,
-                                             self.env_setup,
-                                             self.lunchcombo,
-                                             self.jobs_nr)
+    def pab_droid_make_target(self):
+        cmd = "%s %s %s %d %s" % (self.gendroid,
+                                  self.env_setup,
+                                  self.lunchcombo,
+                                  self.jobs_nr,
+                                  self.submodule)
         self.run_command(cmd)
 
+    def pab_genrecovery(self):
+        """ make recovery image """
+        self.submodule = "recoveryimage"
+        self.pab_droid_make_target()
+
     def pab_genr(self):
-        """ build recovery image """
+        """ pack recovery image """
         if os.path.exists(self.android_out + '/recovery/root'):
             cmds = []
             cmd = "%s/mkbootfs %s/recovery/root | %s/minigzip > %s/ramdisk-recovery.img" % \
