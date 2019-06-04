@@ -1,32 +1,35 @@
-# Python Android Builder(pab)
-
-## Prepareration(Option)
-
-	python -m pip install --user --upgrade setuptools wheel
-	python -m pip install --user --upgrade twine
+# Python Builder For Linux(pbl)
 
 ## Generate package
 
+	python setup.py sdist
+
+## Upload package to repo and install
+
+### generate package
+
+	python -m pip install --user --upgrade setuptools wheel
 	python setup.py sdist bdist_wheel
+	python -m pip install --user --upgrade twine
 
-## Upload the packate(register a count first)
+### uploade the package
 
-    python -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+	python -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
-## Install the package from url
+### Install from repo
 
-    sudo pip install argcomplete
-    sudo pip install -i https://test.pypi.org/simple/ python_android_build
+	sudo pip install argcomplete
+	sudo pip install -i https://test.pypi.org/simple/ PythonBuildForLinux
 
-## Install and Uninstall from local package
+## Install and Uninstall
 
 Install using package
 
-	sudo pip install dist/python_android_build-1.0.0.tar.gz
+	sudo pip install dist/PythonBuildForLinux-1.0.0.tar.gz
 
 without super user permission:
 
-	pip install --user dist/python_android_build-1.0.0.tar.gz
+	pip install --user dist/PythonBuildForLinux-1.0.0.tar.gz
 
 Install from source
 
@@ -38,6 +41,6 @@ Maybe export local path is necessary(Gentoo)
 
 Uninstall
 
-	sudo pip uninstall python_android_build
+	sudo pip uninstall PythonBuildForLinux
 	or
-	sudo -H pip uninstall python_android_build
+	sudo -H pip uninstall PythonBuildForLinux

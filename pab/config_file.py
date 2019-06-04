@@ -4,7 +4,7 @@
 
 def get_config_file(filename):
     # config file path
-    conf_dir = "pabuild/"
+    conf_dir = "config/"
 
     # alias name
     k = ["pabrc", "bt",

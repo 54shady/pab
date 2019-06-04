@@ -21,31 +21,10 @@ def get_vendor_xxx_info():
 
 
 def vendor_xxx(pabObj):
-    """
-    xxx is specific vendor name
-    """
-    vendor_suffix, passwd, vendor_tag = get_vendor_xxx_info()
-    pab_package_prefix = pabObj.product_device[7:] + vendor_tag
-    vendor_package_name = pab_package_prefix + \
-        pabObj.time_stamp + "." + vendor_suffix
-
-    # pack file list below under metadata
-    vendor_file = get_config_file("vendor")
-    pack_list = []
-    with open(vendor_file) as f:
-        pack_list = f.read().splitlines()
-
-    # Found no file to pack? exit
-    if pack_list == []:
-        pabObj.goto_exit("check your %s" % vendor_file)
-
-    # rar a -ep -hpxxx package file
-    # xxx is passwd
-    # exclude path from name
-    pack_cmd = "/usr/bin/rar a -ep -hp%s" % passwd
-    pack_cmd += " metadata/%s" % vendor_package_name
-    for pimages in pack_list:
-        pack_cmd += " metadata/%s" % pimages
-
-    pabObj.run_command(pack_cmd)
-    pabObj.print_success("===> metadata/" + vendor_package_name)
+    afptool = pabObj.android_top + "/pabout/afptool"
+    cmd1 = "%s -pack pabout pabout/update.img" % afptool
+    pabObj.run_command(cmd1)
+    rkimagetool = pabObj.android_top + "/pabout/rkImageMaker"
+    cmd2 = "%s -RK330C pabout/MiniLoaderAll.bin pabout/update.img pabout/rk3399_update.img -os_type:androidos" % rkimagetool
+    pabObj.run_command(cmd2)
+    pabObj.print_success("===> pabout/rk3399_update.img")

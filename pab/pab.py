@@ -29,21 +29,21 @@ class PyAndroidBuild():
         pa = BuildArgument()
         for k, v in pa.argsd.iteritems():
             setattr(self, k, v)
-        self.lunchcombo = self.target_product + "-" + self.build_varient
 
         # build enviroment
-        be = BuildEnv(self.product_device)
+        be = BuildEnv()
         for k, v in be.envd.iteritems():
             setattr(self, k, v)
 
         # vendor
         self.rktools = pjoin(self.uboot_src, "tools")
+        self.libfdt = pjoin(self.uboot_src, "scripts/dtc/libfdt")
+        self.rkbins = pjoin(self.android_top, "rkbin/bin/rk33")
         self.loader = pjoin(
-            self.uboot_out, "RK3288UbootLoader_V2.30.10.bin")
+            self.uboot_out, "rk3399_loader_v1.19.119.bin")
 
         # final images absolutely path
-        self.final_images = pjoin(
-            self.android_top, "rockdev/Image-" + self.target_product)
+        self.final_images = pjoin(self.android_top, "pabout")
 
         # final images relatively path
         self.final_images_r = self.final_images[len(self.android_top) + 1:]
@@ -103,15 +103,6 @@ class PyAndroidBuild():
         except KeyboardInterrupt:
             self.goto_exit("Stop %s" % cmd)
 
-    def install_clean_droid(self):
-        """ make installclean """
-        # make installclean
-        cmd = "%s %s %s %d installclean" % (self.gendroid,
-                                            self.env_setup,
-                                            self.lunchcombo,
-                                            self.jobs_nr)
-        self.run_command(cmd)
-
     def pab_otadiff(self):
         pack_ota_path = pjoin(self.android_top, "out/host/linux-x86")
         pack_ota_key = pjoin(self.android_top, self.ota_key)
@@ -123,47 +114,6 @@ class PyAndroidBuild():
             pack_ota_script, self.source_package, pack_ota_path, pack_ota_key,
             self.target_package, ota_diff_package)
         self.run_command(build_otadiff_cmd)
-
-    def pab_geno(self):
-        """ build ota package """
-        ota_update_uboot = "device/rockchip/" + self.product_device + "/ota/loader"
-        ota_update_parameter = "device/rockchip/" + \
-            self.product_device + "/ota/parameter"
-        nicecopy.ncopy(self.uboot_out + "/RK3288UbootLoader_V2.30.10.bin",
-                       ota_update_uboot)
-        nicecopy.ncopy(self.android_top + "/metadata/parameter",
-                       ota_update_parameter)
-
-        # make ota
-        cmd = "%s %s %s %d otapackage" % (self.gendroid,
-                                          self.env_setup,
-                                          self.lunchcombo,
-                                          self.jobs_nr)
-        self.run_command(cmd)
-
-        # move ota package to metadata
-        ota_package_name = ""
-        pab_package_prefix = "%s%s" % (
-            self.product_device[7:], self.vendor_package_tag)
-        ota_subfix = "_OTA.zip"
-        ota_package_name += pab_package_prefix + self.time_stamp + ota_subfix
-        cmd_move_ota = "mv -vf %s/*.zip %s/%s" % (self.android_out,
-                                                  self.android_top + "/metadata", ota_package_name)
-        self.run_command(cmd_move_ota)
-
-        # do the clean
-        os.remove(ota_update_uboot + "/RK3288UbootLoader_V2.30.10.bin")
-        os.remove(ota_update_parameter + "/parameter")
-
-    def pab_gendroid(self):
-        """ build android """
-        cmd = "%s %s %s %d" % (self.gendroid,
-                               self.env_setup,
-                               self.lunchcombo,
-                               self.jobs_nr)
-        ret = self.run_command(cmd)
-        if ret:
-            self.goto_exit()
 
     def pab_genus(self):
         # copy userdata
@@ -177,28 +127,45 @@ class PyAndroidBuild():
             shutil.rmtree(self.uboot_out)
 
         # make uboot config
-        make_uboot_config = self.pab_make_target(self.uboot_src, self.uboot_out,
+        make_uboot_config = self.pab_make_uboot_target(self.uboot_src, self.uboot_out,
                                                  self.uboot_config)
 
         if not os.path.exists(pjoin(self.uboot_out, ".config")):
             self.run_command(make_uboot_config)
 
         nicecopy.ncopy(self.rktools, self.uboot_out)
+        nicecopy.ncopy(self.libfdt, self.uboot_out + '/scripts/dtc')
+        nicecopy.ncopy(self.rkbins, self.uboot_out)
 
         # make uboot, which just make without named target
-        make_uboot = self.pab_make_target(self.uboot_src, self.uboot_out, "")
+        make_uboot = self.pab_make_uboot_target(self.uboot_src, self.uboot_out, "all")
         self.run_command(make_uboot)
 
-        nicecopy.ncopy(self.loader, self.final_images)
+        loaderimage = self.uboot_out + "/tools/loaderimage"
+        bootmerge = self.uboot_out + "/tools/boot_merger"
+        mkimage = self.uboot_out + "/tools/mkimage"
+        trustmerge = self.uboot_out + "/tools/trust_merger"
+
+        cmds = []
+        cmd1 = "%s --pack --uboot %s/u-boot.bin %s/uboot.img 0x00200000" % (loaderimage, self.uboot_out, self.uboot_out)
+        cmd2 = "%s --pack %s/rk33/RK3399MINIALL.ini" % (bootmerge, self.uboot_out)
+        cmd3 = "%s -n rk3399 -T rksd -d %s/rk33/rk3399_ddr_800MHz_v1.19.bin %s/idbloader.img" % (mkimage, self.uboot_out, "pabout")
+        cmd4 = "%s --pack %s/rk33/RK3399TRUST.ini" % (trustmerge, self.uboot_out)
+        cmds.append(cmd1)
+        cmds.append(cmd2)
+        cmds.append(cmd3)
+        cmds.append(cmd4)
+        self.run_cmdlist(cmds)
+
+        nicecopy.ncopy(self.uboot_out + "/uboot.img", self.final_images)
 
         # pack logo
-        self.pab_packres(self.logo_resource, self.res_in,
-                         self.res_out_logo)
+        #self.pab_packres(self.logo_resource, self.res_in,
+        #                 self.res_out_logo)
 
         # print some info
-        loadername = self.loader.split('/')[-1]
         self.print_success("===> %s" %
-                           (os.path.join(self.final_images_r, loadername)))
+                           (os.path.join(self.final_images_r, "MiniLoaderAll.bin")))
 
     def pab_gens(self):
         """ build system image """
@@ -226,19 +193,6 @@ class PyAndroidBuild():
                                (os.path.join(self.final_images_r, "system.img")))
         else:
             self.goto_exit("No system dir exist.")
-
-    def pab_droid_make_target(self):
-        cmd = "%s %s %s %d %s" % (self.gendroid,
-                                  self.env_setup,
-                                  self.lunchcombo,
-                                  self.jobs_nr,
-                                  self.submodule)
-        self.run_command(cmd)
-
-    def pab_genrecovery(self):
-        """ make recovery image """
-        self.submodule = "recoveryimage"
-        self.pab_droid_make_target()
 
     def pab_genr(self):
         """ pack recovery image """
@@ -316,7 +270,14 @@ class PyAndroidBuild():
 
     def pab_make_target(self, src, out, target):
         """ wraper for make x """
-        make_target = "make -C %s ARCH=arm CROSS_COMPILE=%s O=%s %s -j%d" \
+        make_target = "make -C %s ARCH=arm64 CROSS_COMPILE=%s O=%s %s -j%d" \
+            % (src, self.cross_compile,
+               out, target, self.jobs_nr)
+        return make_target
+
+    def pab_make_uboot_target(self, src, out, target):
+        """ wraper for make x """
+        make_target = "make -C %s CROSS_COMPILE=%s O=%s %s -j%d" \
             % (src, self.cross_compile,
                out, target, self.jobs_nr)
         return make_target
@@ -413,7 +374,7 @@ class PyAndroidBuild():
         post_copy_filename = get_config_file("postcp")
         with open(post_copy_filename) as f:
             misc_stuff = f.read().splitlines()
-        nicecopy.copy_stuffs(self.kernel_out, self.kernel_src, misc_stuff)
+        nicecopy.copy_stuffs(self.kernel_out, self.final_images, misc_stuff)
 
         # final copy
         final_copy = [
@@ -421,3 +382,4 @@ class PyAndroidBuild():
             "resource.img"
         ]
         nicecopy.copy_stuffs(self.kernel_out, self.final_images, final_copy)
+        self.print_success("===> %s" % (os.path.join(self.final_images_r, "boot.img")))

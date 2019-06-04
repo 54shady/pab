@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='python_android_build',
+    name='PythonBuildForLinux',
     version='1.0.0',
     packages=find_packages(),
     include_package_data=True,
@@ -10,7 +10,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'pab = pab:main',
+            'pbl = pab:main',
         ],
     },
 )
