@@ -28,9 +28,15 @@ class BuildArgument():
         parser.add_argument(
             "--kmodule", help="build kernel modules only", action="store_true")
         parser.add_argument(
+            "--kdefconfig", help="kernel defconfig file", type=str)
+        parser.add_argument(
+            "--ktarget", help="kernel target image", type=str)
+        parser.add_argument(
             "-c", "--menuconfig", help="kernel config", action="store_true")
         parser.add_argument(
             "-u", "--uboot", help="build uboot", action="store_true")
+        parser.add_argument(
+            "--udefconfig", help="uboot defconfig file", type=str)
         parser.add_argument(
             "-r", "--rootfs", help="build rootfs", action="store_true")
         parser.add_argument(
@@ -57,6 +63,8 @@ class BuildArgument():
             os.sys.exit()
 
         prj_info = parse_kv_file(self.__buildconfig)
+        self.__build_target = get_config_file("bt")
+        build_target = parse_kv_file(self.__build_target)
 
         self.__build_vendor_package = True if args.package else False
         self.__build_kernel = True if args.kernel else False
@@ -69,6 +77,14 @@ class BuildArgument():
         # clean what build?
         self.__clean_kernel = True if args.clean == "kernel" else False
         self.__clean_uboot = True if args.clean == "uboot" else False
+
+        # kernel defconfig file and tareget build
+        self.__kdefconfig = args.kdefconfig if args.kdefconfig else build_target.get("KERNEL_CONFIG_FILE")
+        self.__ktarget_image = args.ktarget if args.ktarget else build_target.get("KERNEL_TARGET_IMAGE")
+
+        # uboot defconfig file
+        self.__udefconfig = args.udefconfig if args.udefconfig else build_target.get("UBOOT_CONFIG_FILE")
+
         # pack x images
         self.__pack_boot = True if args.pack == "boot" else False
 
@@ -88,6 +104,9 @@ class BuildArgument():
             "kernel_config": self.__kernel_config,
             "pack_system": self.__pack_system,
             "submodule": self.__module,
+            "kernel_config_file": self.__kdefconfig,
+            "kernel_target_image": self.__ktarget_image,
+            "uboot_config": self.__udefconfig,
             "jobs_nr": self.__jobs_nr
         }
 
