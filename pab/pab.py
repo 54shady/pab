@@ -194,26 +194,21 @@ class PyAndroidBuild():
         else:
             self.goto_exit("No system dir exist.")
 
-    def pab_genr(self):
-        """ pack recovery image """
-        if os.path.exists(self.android_out + '/recovery/root'):
-            cmds = []
-            cmd = "%s/mkbootfs %s/recovery/root | %s/minigzip > %s/ramdisk-recovery.img" % \
-                (self.host_bin, self.android_out, self.host_bin,
-                 self.android_out)
-            cmds.append(cmd)
-            cmd = "/usr/bin/truncate -s %%4 %s/ramdisk-recovery.img" % self.android_out
-            cmds.append(cmd)
-            cmd = "%s/mkbootimg --kernel %s/arch/arm/boot/zImage \
-                    --ramdisk %s/ramdisk-recovery.img --second %s/resource.img --output %s/recovery.img" % (
-                self.host_bin, self.kernel_out, self.android_out, self.kernel_out, self.android_out)
-            cmds.append(cmd)
-            self.run_cmdlist(cmds)
+    def pab_genrecovery(self):
+        """ make recovery image """
+        #ramdisk_cfg = "rockchip_rk3399_recovery"
+        cmd = "%s %s %s %d" % (self.gendroid,
+                                  self.env_setup,
+                                  self.target_product,
+                                  self.jobs_nr)
+        self.run_command(cmd)
 
-            nicecopy.ncopy(pjoin(self.android_out,
-                                 'recovery.img'), self.final_images)
-            # print message
-            self.print_success("===> " + self.final_images_r + "/recovery.img")
+        """ pack recovery image """
+        cmd = "%s/scripts/mkbootimg --kernel %s/arch/arm64/boot/Image \
+                --ramdisk buildroot/output/%s/images/rootfs.cpio.gz --second %s/resource.img --output %s/recovery.img" % (
+            self.kernel_src, self.kernel_out, ramdisk_cfg, self.kernel_out, self.final_images)
+        self.run_command(cmd)
+        self.print_success("===> %s" % self.final_images + '/recovery.img')
 
     def pab_genb(self):
         """ build boot image """
@@ -383,3 +378,15 @@ class PyAndroidBuild():
         ]
         nicecopy.copy_stuffs(self.kernel_out, self.final_images, final_copy)
         self.print_success("===> %s" % (os.path.join(self.final_images_r, "boot.img")))
+
+    def pab_genrootfs(self):
+        """ make target in buildroot """
+        #rootfs_combo = "rockchip_rk3399"
+        cmd = "%s %s %s %d" % (self.gendroid,
+                               self.env_setup,
+                               self.target_product,
+                               self.jobs_nr)
+        ret = self.run_command(cmd)
+        if ret:
+            self.goto_exit()
+        self.print_success("===> buildroot/output/%s/images/rootfs.ext2" % self.target_product)

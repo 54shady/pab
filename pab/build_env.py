@@ -24,4 +24,6 @@ class BuildEnv():
             "cross_compile": self.__cross_compile,
             "uboot_src": pjoin(self.__android_top, "u-boot"),
             "kernel_src": pjoin(self.__android_top, "kernel"),
+            "env_setup": pjoin(self.__android_top, "buildroot/build/envsetup.sh"),
+            "gendroid": get_config_file("gendroid"),
         }

@@ -6,6 +6,5 @@ set -e
 # $2 combo
 # $3 numbers of running jonbs
 # $4 [otapackage, systemimage, bootimage,etc]
-source $1
-lunch $2
-make -j$3 $4
+source $1 $2
+make -j$3

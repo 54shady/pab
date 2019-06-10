@@ -43,6 +43,12 @@ def main():
     # pack images(append in order)
     args_action.append_node_rear(pab.pack_boot, pab.pab_genb)
 
+    # build rootfs
+    args_action.append_node_rear(pab.build_rootfs, pab.pab_genrootfs)
+
+    # build recovery
+    args_action.append_node_rear(pab.build_recovery, pab.pab_genrecovery)
+
     # try argument action first
     args_action.do_command()
 

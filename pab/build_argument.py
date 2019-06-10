@@ -37,8 +37,13 @@ class BuildArgument():
             "-u", "--uboot", help="build uboot", action="store_true")
         parser.add_argument(
             "--udefconfig", help="uboot defconfig file", type=str)
+        parser.add_argument("-t", "--target_product",
+                help='rootfs: rockchip_rk3399, recovery: rockchip_rk3399_recovery',
+                type=str)
         parser.add_argument(
             "-r", "--rootfs", help="build rootfs", action="store_true")
+        parser.add_argument(
+            "--recovery", help="build recovery image", action="store_true")
         parser.add_argument(
             "--module", help="Alternative for make submodule", type=str)
         parser.add_argument(
@@ -89,9 +94,12 @@ class BuildArgument():
         self.__pack_boot = True if args.pack == "boot" else False
 
         self.__kernel_config = True if args.menuconfig else False
-        self.__pack_system = True if args.rootfs else False
+        self.__build_rootfs = True if args.rootfs else False
+        self.__build_recovery = True if args.recovery else False
 
         self.__jobs_nr = args.jobs if args.jobs else 16
+        self.__target_product = args.target_product if args.target_product else prj_info[
+            "TARGET_PRODUCT"]
 
         self.argsd = {
             "build_kernel": self.__build_kernel,
@@ -102,11 +110,12 @@ class BuildArgument():
             "clean_uboot": self.__clean_uboot,
             "pack_boot": self.__pack_boot,
             "kernel_config": self.__kernel_config,
-            "pack_system": self.__pack_system,
-            "submodule": self.__module,
             "kernel_config_file": self.__kdefconfig,
             "kernel_target_image": self.__ktarget_image,
             "uboot_config": self.__udefconfig,
+            "build_rootfs": self.__build_rootfs,
+            "build_recovery": self.__build_recovery,
+            "target_product": self.__target_product,
             "jobs_nr": self.__jobs_nr
         }
 
