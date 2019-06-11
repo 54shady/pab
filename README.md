@@ -44,3 +44,37 @@ Uninstall
 	sudo pip uninstall PythonBuildForLinux
 	or
 	sudo -H pip uninstall PythonBuildForLinux
+
+## Usage
+
+### Compile uboot
+
+For RK3399 sapphire-excavator board
+
+	pbl --udefconfig evb-rk3399_defconfig -u
+
+For firefly-rk3399 board(default config)
+
+	pbl -u
+	or using config
+	pbl --udefconfig firefly-rk3399_defconfig -u
+
+### Flash uboot
+
+	upgrade_tool di -uboot uboot.img && upgrade_tool rd
+
+### Compile kernel
+
+For RK3399 sapphire-excavator board
+
+	pbl --ktarget rk3399-sapphire-excavator-linux.img -k
+
+For firefly-rk3399 board(default config)
+
+	pbl -k
+	or using config
+	pbl --ktarget rk3399-firefly-linux.img -k
+
+### Flash kernel
+
+	upgrade_tool di -b boot.img && upgrade_tool rd

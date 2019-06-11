@@ -1,3 +1,1 @@
-arch/arm/boot/zImage
-kernel.img
-resource.img
+boot.img
