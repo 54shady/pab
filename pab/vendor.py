@@ -25,8 +25,8 @@ def vendor_xxx(pabObj):
     cmd1 = "%s -pack pabout pabout/update.img" % afptool
     pabObj.run_command(cmd1)
     rkimagetool = pabObj.android_top + "/pabout/rkImageMaker"
-    release_update = pabObj.kernel_target_image[7:-4]
-    cmd2 = "%s -RK330C pabout/MiniLoaderAll.bin pabout/update.img pabout/%s_update.img -os_type:androidos" % (rkimagetool,
+    release_update = pabObj.kernel_target_image[7:-4] + '-' + pabObj.time_stamp + '.img'
+    cmd2 = "%s -RK330C pabout/MiniLoaderAll.bin pabout/update.img pabout/%s -os_type:androidos" % (rkimagetool,
             release_update)
     pabObj.run_command(cmd2)
-    pabObj.print_success("===> pabout/%s_update.img" % release_update)
+    pabObj.print_success("===> pabout/%s" % release_update)
