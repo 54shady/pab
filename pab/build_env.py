@@ -9,11 +9,26 @@ from config_file import get_config_file
 
 class BuildEnv():
     def __init__(self):
+        # parse the global config file
+        self.__buildconfig = get_config_file("pabrc")
+        try:
+            assert os.path.exists(self.__buildconfig)
+        except AssertionError:
+            print 'Error : Not on android source tree'
+            os.sys.exit()
+
+        prj_info = parse_kv_file(self.__buildconfig)
+
         self.__android_top = os.path.abspath(os.getcwd())
         self.__otp = "out"
         self.__android_out = pjoin(self.__android_top, self.__otp)
-        self.__armgcc = "prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-"
-        self.__cross_compile = pjoin(self.__android_top, self.__armgcc)
+
+        # config CROSS_COMPILE=aarch64-linux-gnu-
+        # or leave it empty will using the prebuiltsgcc
+        prebuiltsgcc = "prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-"
+        self.__armgcc = prj_info['CROSS_COMPILE'] if prj_info['CROSS_COMPILE'] else prebuiltsgcc
+        self.__cross_compile = prj_info['CROSS_COMPILE'] if prj_info['CROSS_COMPILE'] else pjoin(self.__android_top, self.__armgcc)
+
         self.envd = {
             "android_top": self.__android_top,
             "otp": self.__otp,
